@@ -1,0 +1,176 @@
+// Writes bloxity-setup.html: every field of Bloxity's Create New Game form, top to bottom, with copy buttons.
+// Run: node tests/setup-page.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SLUG = 'lab-rivals', NAME = '[🔬RED vs BLUE] +1 Speed Lab Keyboard Escape', TITLE = 'Lab Rivals', PROD = `https://${SLUG}.play.bloxity.io/`;
+const SEO = `${TITLE} - RED LAB vs BLUE LAB Team Battle, +1 Speed Every Step, Run the Giant Lab Keyboard, Dodge Spike Presses and Steel Balls, Outrun Dr. Mutagen | Free 3D Running Game`;
+const SHORT = 'RED LAB vs BLUE LAB! Every step is +1 Speed. Level up to walk faster, then run the Test Track: a giant green-and-white keyboard through the rooms of a speed lab, 80 stages behind lab doors, with a giant scientist walking his room, spike presses slamming down, giant steel balls rolling at you, laser sweepers, falling flasks, slime pits, stepping keys and jump pads, and Dr. Mutagen, a giant mutant scientist, right behind you. Every door scores points for your lab in a 5-minute Team Battle and pays Wins. Unlock faster treadmills, hatch lab pets, rebirth for a multiplier and race in Slime Rush.';
+const LONG = [
+    '🔬 RED LAB vs BLUE LAB! Every step is +1 SPEED: run the giant lab keyboard, score for your lab and ESCAPE! ⌨️',
+    '🔥 FEATURES 🔥',
+    '🔴🔵 TEAM BATTLE: everyone in your server is on the RED LAB or the BLUE LAB. Every door you pass scores points for your lab; the winning lab gets Wins and Gems every 5 minutes',
+    '⚡ Every step is +1 Speed, and your daily Lab Streak multiplies it: level up to walk faster',
+    '⌨️ Run the Test Track: 80 lab rooms of giant clacky green and white keycaps, a doorway at the end of each, every door pays Wins',
+    '🥼 Sneak past the GIANT scientist walking round his office: touch him and you are out',
+    '🧟 Outrun Dr. Mutagen, a giant mutant scientist with glowing goggles who bursts out of his vent and chases you',
+    '🔨 Dodge spike presses slamming down, giant rolling steel balls, laser sweepers and falling flasks',
+    '🟢 Jump the slime: stepping keys, catwalks, glitch keys and jump pads',
+    '🧪 4 sectors: the Green Lab, the Frost Lab, Toxic Works and the Plasma Core',
+    '🏃 Train on treadmills up to +60 a step: the Wins you earn open faster ones',
+    '🐭 Hatch 40 lab pets, from a Lab Rat to the Mutant Dragon, to multiply every step',
+    '🔁 Rebirth for a Speed multiplier that stays',
+    '🌊 Slime Rush: race 5 others with the slime wave rolling in behind you',
+    '👥 Play with friends: every player in your server gives everyone a Friend Bonus',
+    '🎁 Daily rewards, quests, free gifts, a lucky wheel and codes',
+].join('\n');
+const TAGS = ['Running', 'Simulator', 'Incremental', 'Obby', 'Parkour', 'Escape', 'Team', 'Adventure', 'Keyboard', 'ASMR', 'Multiplayer', 'Competitive', 'Racing', 'Casual', '3D', 'Family-friendly', 'Kid-friendly', 'In-game Currency', 'Leaderboards', 'Rebirth', 'Pets', 'Long Session'];
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const field = (label, value, o) => {
+    o = o || {};
+    const cls = o.mono ? 'val mono' : 'val';
+    if (o.plain) return `<div class="field"><div class="label">${esc(label)}</div><div class="val">${value}</div><span></span></div>`;
+    return `<div class="field"><div class="label">${esc(label)}</div><div class="${cls}">${esc(value)}</div><button class="copy" data-v="${esc(value)}">Copy</button></div>`;
+};
+const opt = (name, on, why) => `<tr><td>${esc(name)}</td><td class="${on ? 'on' : 'off'}">${on ? '&#9745; ON' : '&#9744; OFF'}</td><td class="why">${esc(why || '')}</td></tr>`;
+const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab Rivals Setup</title>
+<style>
+:root { --bg: #f4f6fb; --card: #ffffff; --ink: #1b1d2a; --muted: #5d6478; --line: #e1e5ef; --accent: #2a7cff; --ok: #1e9e4a; --chip: #eef3ff; --off: #9aa0b0; --warn: #b86a00; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #12141c; --card: #1b1e29; --ink: #eef0f7; --muted: #a2a9bd; --line: #2c3142; --accent: #5aa0ff; --ok: #4cd37c; --chip: #23293a; --off: #6c7386; --warn: #ffb44a; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1060px; margin: 0 auto; padding: 28px 16px 60px; }
+h1 { font-size: 28px; margin: 0 0 4px; }
+h2 { font-size: 19px; margin: 34px 0 10px; }
+h2 small { font-size: 13px; color: var(--muted); font-weight: 500; }
+p.sub { color: var(--muted); margin: 0 0 8px; }
+p.warn { color: var(--warn); font-weight: 600; margin: 8px 0; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 6px 16px; }
+.field { display: grid; grid-template-columns: 210px 1fr auto; gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.field:last-child { border-bottom: none; }
+.label { color: var(--muted); font-weight: 600; padding-top: 2px; }
+.val { white-space: pre-wrap; word-break: break-word; }
+.mono, code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 13.5px; }
+button.copy { border: 1px solid var(--line); background: var(--chip); color: var(--ink); border-radius: 8px; padding: 4px 10px; font: 600 13px system-ui, sans-serif; cursor: pointer; }
+button.copy:hover { border-color: var(--accent); }
+button.copy.done { color: var(--ok); border-color: var(--ok); }
+.tablewrap { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-size: 13px; font-weight: 600; background: var(--chip); }
+tr:last-child td { border-bottom: none; }
+td.on { color: var(--ok); font-weight: 700; white-space: nowrap; }
+td.off { color: var(--off); white-space: nowrap; }
+td.why { color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 0; }
+.tag { border: 1px solid var(--line); background: var(--chip); border-radius: 7px; padding: 2px 9px; font-size: 13px; font-weight: 600; }
+ol.steps { padding-left: 20px; margin: 0; } ol.steps li { margin: 6px 0; }
+@media (max-width: 640px) { .field { grid-template-columns: 1fr auto; } .label { grid-column: 1 / -1; } }
+.covers { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; align-items: start; }
+.covers figure { margin: 0; }
+.covers img { width: 100%; border-radius: 10px; border: 2px solid rgba(255,255,255,0.18); display: block; }
+.covers figcaption { margin-top: 6px; font-size: 13px; opacity: 0.85; display: flex; justify-content: space-between; gap: 8px; }
+.covers a { color: inherit; font-weight: 700; }
+@media (max-width: 700px) { .covers { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+    <h1>${esc(NAME)}: Create New Game</h1>
+    <p class="sub">Every field of the dev.bloxity.io Manage Games &rarr; <b>Create New Game</b> form, top to bottom. Click Copy to copy a value. This game has <b>no in-app purchases</b> (no Bux are spent anywhere): Eggs, treadmills, upgrades, trails, auras, revives, skips, Speed packs and x2 boosts all cost Wins or Gems earned in the game (a revive, a skip and x2 Speed can also be had for a rewarded ad), and rebirths are free.</p>
+    <p class="warn">Use the <b>prod</b> URL (${PROD}) everywhere, never a .dev.play.bloxity.io one. It works once the game is hosted (see Hosting steps).</p>
+    <p class="warn">If the form opens with another game's values already in it (slug, name, webhook URL, release date), replace or clear every one of them.</p>
+
+    <h2>Basic Info</h2>
+    <div class="card">
+    ${field('Slug *', SLUG, { mono: true })}
+    ${field('Name *', NAME)}
+    ${field('SEO Name (optional)', SEO)}
+    ${field('Developer', 'Your choice (Show developer and the community)', { plain: true })}
+    ${field('Game Source *', 'Choose <b>External URL</b> (not Upload ZIP): the game is hosted by Legion.', { plain: true })}
+    ${field('Game URL', PROD, { mono: true })}
+    ${field('Raw URL (optional)', PROD, { mono: true })}
+    ${field('CG URL (optional)', '<span style="color:var(--off)">Leave empty</span>', { plain: true })}
+    ${field('Additional Game Domains', `${SLUG}.play.bloxity.io\n${SLUG}.host.bloxity.io`, { mono: true })}
+    ${field('Short Description', SHORT)}
+    ${field('Description', LONG)}
+    </div>
+
+    <h2>Checkboxes</h2>
+    <div class="tablewrap"><table><thead><tr><th>Option</th><th>Set to</th><th>Why</th></tr></thead><tbody>
+        ${opt('SDK Support', true, 'The game loads the Bloxity SDK (login, avatars, chat, emotes, settings, the death screen, ads, leaderboards).')}
+        ${opt('LoadingEnd Support', true, 'The game calls loadingEnd() as soon as it has joined a server (no start menu).')}
+        ${opt('Active', true, 'So players can find it.')}
+        ${opt('Disable from Discovery', false, 'Only if you want to share the link before it is listed.')}
+        ${opt('Disable on New Games category', false)}
+        ${opt('Add to Pre Release category', false)}
+        ${opt('Under Maintenance', false)}
+        ${opt('Show Boxity Chat', true, 'Chat bubbles appear over players in the world.')}
+        ${opt('In-game Voice', true, 'The game reports its room, so players on the same server can talk.')}
+        ${opt('Show Missions Button', false, 'The game has its own daily tasks and quests.')}
+        ${opt('Mobile Force Landscape', false, 'The game is built to play held upright (the vertical feed) as well as sideways.')}
+        ${opt('Disable for CG', false)}
+        ${opt('Disable for MSN', false)}
+        ${opt('Enable New ESC Menu', true, 'ESC opens the portal menu; the game reports its room id.')}
+    </tbody></table></div>
+    <div class="card" style="margin-top:12px">
+    ${field('Engine', 'three.js (only an admin can set this)', { plain: true })}
+    ${field('Page Layout', 'Classic', { plain: true })}
+    </div>
+
+    <h2>Cover Images</h2>
+    <div class="card">
+        <div class="covers">
+            <figure><img src="covers/cover-1920x1080.png" alt="${esc(NAME)} landscape cover"><figcaption><span>Landscape 16:9 * · 1920 x 1080</span><a href="covers/cover-1920x1080.png" download>Download</a></figcaption></figure>
+            <figure><img src="covers/cover-800x800.png" alt="${esc(NAME)} square cover"><figcaption><span>Square 1:1 * · 800 x 800</span><a href="covers/cover-800x800.png" download>Download</a></figcaption></figure>
+        </div>
+        <p class="sub" style="margin-top:8px">Both are rendered from the game itself (a runner sprinting down the Test Track of the Green Lab, a spike press and the lab doors ahead, the RED LAB vs BLUE LAB banner over the name). Files: <code>covers/cover-1920x1080.png</code>, <code>covers/cover-800x800.png</code>. To make them again: <code>node tests/covers.mjs</code>.</p>
+    </div>
+
+    <h2>Tags <small>(${TAGS.length})</small></h2>
+    <div class="card"><div class="tags">${TAGS.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</div></div>
+    <p class="sub" style="margin-top:8px">Pick each from the form's tag bank; if one isn't there, use the closest it has.</p>
+
+    <h2>In-App Purchases <small>(none)</small></h2>
+    <div class="card">
+    ${field('IAPs', 'Leave empty. Everything is bought with Wins or Gems inside the game.', { plain: true })}
+    ${field('Default Webhook URL', '<span style="color:var(--off)">Clear it (no purchases, no webhook)</span>', { plain: true })}
+    </div>
+
+    <h2>Release</h2>
+    <div class="card">
+    ${field('Release date &amp; time', 'Click <b>Clear</b> so it publishes as soon as it is Active.', { plain: true }).replace('&amp;amp;', '&amp;')}
+    </div>
+    <p class="sub" style="margin-top:10px">Then click <b>Create Game</b>.</p>
+
+    <h2>Hosting steps</h2>
+    <div class="card" style="padding:14px 16px"><ol class="steps">
+        <li>GitHub: create the empty repo <code>LEGiON-Platforms/${SLUG}</code> (no README) and add the repo secret <code>LEGION_DEPLOY_TOKEN</code>.</li>
+        <li>hosting.bloxity.io: the app <code>${SLUG}</code> must exist (its id is <code>GAME_ID</code> in <code>.github/workflows/deploy.yml</code>).</li>
+        <li>Push the code to <code>main</code> (as <code>asivixlp44-cmyk</code>): the workflow builds the server image and the client and deploys both.</li>
+        <li>Check <code>https://${SLUG}.host.bloxity.io/health</code> (it should say <code>"db": true</code>: Legion provides <code>MONGODB_URI</code>) and play at <code>https://${SLUG}.play.bloxity.io</code>.</li>
+        <li>Create the game in Manage Games with the values above (slug exactly <code>${SLUG}</code>).</li>
+    </ol></div>
+</main>
+<script>
+document.addEventListener('click', async (e) => {
+    const b = e.target.closest('button.copy');
+    if (!b || !b.dataset.v) return;
+    try { await navigator.clipboard.writeText(b.dataset.v); }
+    catch (err) { const t = document.createElement('textarea'); t.value = b.dataset.v; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    const old = b.textContent; b.textContent = '✓'; b.classList.add('done');
+    setTimeout(() => { b.textContent = old; b.classList.remove('done'); }, 1200);
+});
+</script>
+</body>
+</html>
+`;
+fs.writeFileSync(path.join(ROOT, 'bloxity-setup.html'), html);
+console.log('wrote bloxity-setup.html');

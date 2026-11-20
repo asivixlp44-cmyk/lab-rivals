@@ -3,6 +3,8 @@
 A multiplayer "+1 Speed" keyboard runner for the browser, built with **Three.js** and **Colyseus** for Bloxity. It is listed as
 **[🔬RED vs BLUE] +1 Speed Lab Keyboard Escape**, slug `lab-rivals`.
 
+**Play it live:** https://lab-rivals.play.bloxity.io (every push to `main` deploys there).
+
 **RED LAB vs BLUE LAB.** Everyone in a server is on one of two rival labs, racing up a giant keyboard to score for their side.
 
 - **Speed and Levels.** Every step is **+1 Speed and +1 XP, times all your boosts**, and every step clacks a giant keycap.
